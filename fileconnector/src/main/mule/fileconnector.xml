@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="504dd717-8618-449b-872b-117dcb5f43ea" >
+		<http:listener-connection host="localhost" port="8081" />
+	</http:listener-config>
+	<file:config name="File_Config" doc:name="File Config" doc:id="3c4fab3a-f974-4a8d-b267-eb0c7dac9db4" >
+		<file:connection workingDir="C:\Users\Ramu\Desktop\Mule" />
+	</file:config>
+	<ftp:config name="FTP_Config" doc:name="FTP Config" doc:id="cdb33eb9-7494-42db-b8b1-cf93ec0c718b" >
+		<ftp:connection host="121.13.15.23" username="raju" password="raju@123"/>
+	</ftp:config>
+	<email:smtp-config name="Email_SMTP" doc:name="Email SMTP" doc:id="8b150763-123d-435e-a6a9-f8a900d0615f" >
+		<email:smtp-connection host="smtp.gmail.com" user="ramu.kola9@gmail.com" password="Gamma@123" port="587">
+			<email:properties >
+				<email:property key="mail.smtp.starttls.enable" value="true" />
+			</email:properties>
+		</email:smtp-connection>
+	</email:smtp-config>
+	<file:config name="File_Config1" doc:name="File Config" doc:id="2b7a6d6c-33da-436c-98fb-67c1c0f70982" />
+	<flow name="fileconnectorFlow" doc:id="2e5e79e2-0878-49bd-baf9-403b8aeec5e9" >
+		<http:listener doc:name="Listener" doc:id="092fd9a8-f0bd-4fa3-8a3b-d7ef410dafeb" config-ref="HTTP_Listener_config" path="/Test"/>
+		<file:read doc:name="Read" doc:id="a73da8f1-d733-4935-b50b-fb1b41dffe74" config-ref="File_Config" path='C:\Users\Ramu\Desktop\Mule\attachments.txt'/>
+		<email:send doc:name="Send" doc:id="c311015c-4670-4625-bc2e-9eda4cd95f18" config-ref="Email_SMTP" subject="Test email2">
+			<email:to-addresses >
+				<email:to-address value="ramu.kola9@gmail.com" />
+			</email:to-addresses>
+			<email:cc-addresses >
+				<email:cc-address value="ramu.kola9@hotmail.com" />
+			</email:cc-addresses>
+			<email:body>
+				<email:content ><![CDATA["Please find the attached details"]]></email:content>
+			</email:body>
+			<email:attachments ><![CDATA[#[{
+	"Attachment.txt":payload
+}]]]></email:attachments>
+		</email:send>
+		<logger level="INFO" doc:name="Logger" doc:id="c44ced85-e23e-4290-8776-aa43fbaebf04" message="#[payload]"/>
+	</flow>
+</mule>
